@@ -1,0 +1,42 @@
+{{ define "title" }}Edit - {{ (index .page.Title 0).Text }}{{ end }}
+
+{{ define "content" }}
+    <h2>{{ (index .page.Title 0).Text }}</h2>
+    <h3>{{ (index .page.Category 0).Text }} - {{ (index .page.Subcategory 0).Text }}</h3>
+    <form action="" method="POST">
+        <label for="title">Page title</label>
+        <div class="grid">
+            <div>{{ (index .page.Title 0).Text }}</div>
+            <div>
+                <textarea id="title" name="title" cols="30" rows="2"></textarea>
+            </div>
+        </div>
+        <label for="category">Page category</label>
+        <div class="grid">
+            <div>{{ (index .page.Category 0).Text }}</div>
+            <div>
+                <textarea id="category" name="category" cols="30" rows="2"></textarea>
+            </div>
+        </div>
+        <label for="subcategory">Page sub-category</label>
+        <div class="grid">
+            <div>{{ (index .page.Subcategory 0).Text }}</div>
+            <div>
+                <textarea id="subcategory" name="subcategory" cols="30" rows="2"></textarea>
+            </div>
+        </div>
+        <label for="text">Page text</label>
+        <div class="grid">
+            <div>
+                {{ printf (index .page.Text 0).Text }}
+            </div>
+            <div>
+                <textarea id="text" name="text" cols="30" rows="10"></textarea>
+            </div>
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+{{ end }}
+
+{{ define "page/edit.tmpl" }}{{ template "layouts/layout.tmpl" . }}{{ end }}
+

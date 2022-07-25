@@ -1,6 +1,6 @@
 package model
 
-type Texts []Localized
+type LocalizedList []Localized
 
 type Localized struct {
     Lang    string  `json:"lang"`

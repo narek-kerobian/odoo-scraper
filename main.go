@@ -17,19 +17,22 @@ func main() {
         panic(err)
     }
 
+    // Get DB_PATH
+    dbPath := os.Getenv("APP_DB_PATH")
+
     // Parse flags
     flags := service.FlagVars{}
     flags.ParseFlags()
 
     // Scrape oddo documentation
     if flags.Scrape {
-        service.InitScraper(os.Getenv("APP_DB_PATH"))
+        service.InitScraper(dbPath)
     }
 
     // Run the web server
     if flags.Serve {
         r := gin.Default()
-        config.InitRoutes(r)
+        config.InitRoutes(r, dbPath)
 
         port := os.Getenv("APP_PORT")
         r.Run(":" + port)

@@ -1,0 +1,30 @@
+{{ define "title" }}Page List{{ end }}
+
+{{ define "content" }}
+    {{ $parentCategory := "###" }}
+    {{ $parentSubCategory := "##" }}
+
+    {{ range $key, $page := .pages }}
+        <div>
+            {{ if $page.Category }}
+                {{ $currentCategory := (index $page.Category 0).Text }}
+                {{ $currentCategory }}
+            {{ end }}
+            -
+            {{ if $page.Subcategory }}
+                {{ $currentSubCategory := (index $page.Subcategory 0).Text }}
+                {{ $currentSubCategory }}
+            {{ end }}
+            <ul>
+                {{ range $page.Title }}
+                    {{ if eq .Lang "en" }}
+                    <li><a href="/{{ $page.ID }}">{{ .Text }}</a></li>
+                    {{ end }}
+                {{ end }}
+            </ul>
+        </div>
+    {{ end }}
+{{ end }}
+
+{{ define "page/list.tmpl" }}{{ template "layouts/layout.tmpl" . }}{{ end }}
+

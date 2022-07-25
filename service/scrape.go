@@ -31,7 +31,7 @@ func InitScraper(dbPath string) {
         listID := []uint{}
 
         for _, v := range pages {
-            title := fmt.Sprintf("%s", v.Title)
+            title := fmt.Sprintf("%s", v.Title[0].Text)
             list = append(list, title)
             listID = append(listID, v.ID)
         }
@@ -73,65 +73,36 @@ func Scrape(dbPath string, url string, parentId uint) {
     )
 
     // Set parallelism to 1
-    c.Limit(&colly.LimitRule{DomainGlob: "*", Parallelism: 1})
+    c.Limit(&colly.LimitRule{DomainGlob: "*", Parallelism: 3})
 
-    if parentId == 0 {
-        // Scrape parent page
-        scrapeParent(db, c)
-    } else {
-        // Scrape child page
-        scrapeChild(db, c, parentId)
-    }
 
     // Before making a request print "Visiting ..."
 	c.OnRequest(func(r *colly.Request) {
 		fmt.Println("Visiting", r.URL.String())
 	})
 
+    c.OnResponse(func(r *colly.Response) {
+        // Scrape pages
+        if parentId == 0 {
+            // Scrape parent page
+            scrapePage(
+                db, 
+                c, 
+                0, 
+                r.Request.URL.String(), 
+                model.Localized{}, 
+                model.Localized{},
+            )
+        } else {
+            // Scrape child page
+            scrapeChild(db, c, parentId)
+        }
+        
+    })
+
     // c.Visit("https://www.odoo.com/documentation/15.0/applications/inventory_and_mrp/inventory.html")
     c.Visit(url)
-
     c.Wait()
-}
-
-// Scrape parent page
-func scrapeParent(db *gorm.DB, c *colly.Collector) {
-    // On every a element which has href attribute call callback
-	c.OnHTML(
-        "#o_content > div[role=\"main\"] > section:first-child", 
-        func(e *colly.HTMLElement) {
-            var page *model.Page
-            page = new(model.Page)
-
-            // Set parent page title
-            title := e.ChildText("h1")
-            page.Title = strings.Trim(title, "¶")
-
-            // Set parent page original url
-            page.UrlOriginal = e.Request.AbsoluteURL(e.Request.URL.Path)
-
-            // Set parent page texts
-            pageText := ""
-            e.ForEach("section > p", func (i int, el *colly.HTMLElement) {
-                html, err := el.DOM.Html()
-                if err != nil {
-                    panic(err)
-                }
-                pageText = pageText + "<p>" + strings.TrimSpace(html) + "</p>"
-            })
-
-            // Fix image urls
-            r, _ := regexp.Compile("(?:[\"])((../)+)")
-            text := model.Localized{
-                Lang: "en",
-                Text: r.ReplaceAllString(pageText, "\"https://www.odoo.com/documentation/15.0/"),
-            }
-
-            page.Text = append(page.Text, text)
-
-            // Persist page
-            db.Create(page)
-        })
 }
 
 // Scrape child page
@@ -141,23 +112,30 @@ func scrapeChild(db *gorm.DB, c *colly.Collector, parentId uint) {
         ".toctree-wrapper .toctree-l1", 
         func(e *colly.HTMLElement) {
             
-            category := ""
+            category := model.Localized{
+                Lang: "en",
+                Text: "",
+            }
 
             // Get category
             e.ForEach(".toctree-l1 > a", func(i int, elCat *colly.HTMLElement) {
-                category = strings.TrimSpace(elCat.Text) 
+                category.Text = strings.TrimSpace(elCat.Text) 
 
                 // Get subcategory
                 e.ForEach(".toctree-l1 > ul li.toctree-l2", func(i int, elSubCat *colly.HTMLElement) {
-                    subcategory := ""
+                    subcategory := model.Localized{
+                        Lang: "en",
+                        Text: "",
+                    }
+
                     elSubCat.ForEach("li.toctree-l2 > a", func(i int, elSubCatTitle *colly.HTMLElement) {
-                        subcategory = strings.TrimSpace(elSubCatTitle.Text)
+                        subcategory.Text = strings.TrimSpace(elSubCatTitle.Text)
                         parent := elSubCatTitle.DOM.Parent()
 
                         // Define link selector and check if there are subcategories
                         linkSelector := "li.toctree-l3 a"
                         if len(parent.Find(linkSelector).Nodes) == 0 {
-                            subcategory = ""
+                            subcategory.Text = ""
                             linkSelector = "li.toctree-l2 a"
                         } 
 
@@ -190,8 +168,8 @@ func scrapePage(
     c *colly.Collector, 
     parentId uint,
     requestUrl string,
-    category string, 
-    subcategory string,
+    category model.Localized, 
+    subcategory model.Localized,
 ) {
     // Scrape the main body
     c.OnHTML("article#o_content div[role=\"main\"]", func(e *colly.HTMLElement) {
@@ -204,8 +182,12 @@ func scrapePage(
                 page = new(model.Page)
 
                 // Get the title
-                page.Title = strings.Trim(titleNode.First().Text(), "¶")
-                
+                pageTitle := model.Localized{
+                    Lang: "en",
+                    Text: strings.Trim(titleNode.First().Text(), "¶"),
+                }
+                page.Title = append(page.Title, pageTitle)
+
                 // Remove the parent node
                 titleNode.First().Remove()
 
@@ -231,8 +213,12 @@ func scrapePage(
 
                 page.Text = append(page.Text, text)
                 page.Parent = parentId
-                page.Category = category
-                page.Subcategory = subcategory
+                if len(category.Text) > 0 {
+                    page.Category = append(page.Category, category)
+                }
+                if len(subcategory.Text) > 0 {
+                    page.Subcategory = append(page.Subcategory, subcategory)
+                }
 
                 // Persist page
                 db.Create(page)
