@@ -6,19 +6,23 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gitlab.com/bracketnco/odoo-scraper/model"
+	"gitlab.com/bracketnco/odoo-scraper/service"
 	"gorm.io/gorm"
 )
 
+// List available pages
 func ListPages(db *gorm.DB) gin.HandlerFunc {
     return func(c *gin.Context) {
         pages := model.Page{}.FindAll(
             db.Order("category").Order("subcategory"))
-        c.HTML(http.StatusOK, "page/list.tmpl", gin.H{
+
+        service.BuildTemplateResponse(c, http.StatusOK, "page/list.tmpl", gin.H{
             "pages": pages,
-		})
+        })
     }
 }
 
+// Display and edit page texts
 func EditPage(db *gorm.DB) gin.HandlerFunc {
     return func(c *gin.Context) {
         pageId := c.Param("id")
@@ -29,9 +33,9 @@ func EditPage(db *gorm.DB) gin.HandlerFunc {
 
         page := model.Page{}.FindOneById(db, uint(id))
 
-        c.HTML(http.StatusOK, "page/edit.tmpl", gin.H{
+        service.BuildTemplateResponse(c, http.StatusOK, "page/edit.tmpl", gin.H{
             "page": page,
-		})
+        })
     }
 }
 

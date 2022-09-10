@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gitlab.com/bracketnco/odoo-scraper/controller"
 	"gitlab.com/bracketnco/odoo-scraper/controller/api"
+	"gitlab.com/bracketnco/odoo-scraper/middleware"
 	"gitlab.com/bracketnco/odoo-scraper/service"
 )
 
@@ -16,8 +17,8 @@ func InitRoutes(r *gin.Engine, dbPath string) {
     // Heartbeat controller
     r.GET("/heartbeat", controller.GetHeartbeat)
 
-    // Load templates
-    r.LoadHTMLGlob("templates/**/*")
+    // Load middlewares
+    r.Use(middleware.ExposeGinEngine(r))
 
     // API routes
     // Page routes
@@ -32,6 +33,6 @@ func InitRoutes(r *gin.Engine, dbPath string) {
     // Page routes
     r.GET("",  controller.ListPages(db)) 
     r.GET("/:id", controller.EditPage(db)) 
-    // r.POST("/:id", controller.EditPage(db)) 
+    r.POST("/:id", controller.EditPage(db)) 
 }
 
