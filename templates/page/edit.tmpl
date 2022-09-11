@@ -42,14 +42,13 @@
         {{ if ne .page.Text nil }}
         <label for="text">Page text</label>
         <div class="grid">
-            <div>
-                {{ (index .page.Text 0).Text }}
-            </div>
+            <div>{{ ParseRawHtml (index .page.Text 0).Text }}</div>
             <div>
                 <textarea id="text" name="text" cols="30" rows="10"></textarea>
             </div>
         </div>
         {{ end }}
+        <br>
         <button type="submit">Submit</button>
     </form>
 {{ end }}
