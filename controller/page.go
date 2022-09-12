@@ -6,7 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gitlab.com/bracketnco/odoo-scraper/model"
-	"gitlab.com/bracketnco/odoo-scraper/service"
+	service "gitlab.com/bracketnco/odoo-scraper/service/common"
+	"gitlab.com/bracketnco/odoo-scraper/service/page"
 	"gorm.io/gorm"
 )
 
@@ -16,6 +17,7 @@ func ListPages(db *gorm.DB) gin.HandlerFunc {
         pages := model.Page{}.FindAll(
             db.Order("category").Order("subcategory"))
 
+        // Build and return a response
         service.BuildTemplateResponse(c, http.StatusOK, "page/list.tmpl", gin.H{
             "pages": pages,
         })
@@ -25,16 +27,29 @@ func ListPages(db *gorm.DB) gin.HandlerFunc {
 // Display and edit page texts
 func EditPage(db *gorm.DB) gin.HandlerFunc {
     return func(c *gin.Context) {
+        var errors []error
+
+        // Get page param
         pageId := c.Param("id")
         id, err := strconv.ParseUint(pageId, 10, 32)
         if err != nil {
-            panic(err)
+            errors = append(errors, err)
         }
 
-        page := model.Page{}.FindOneById(db, uint(id))
+        // Retrieve page entity
+        pageEntity := model.Page{}.FindOneById(db, uint(id))
 
+        // Bind and process the submitted form
+        var form page.PageForm
+        if err := form.Bind(c); err != nil {
+            errors = append(errors, err)
+        }
+        form.PostPageFormProcessor(pageEntity, db)
+
+        // Build and return a response
         service.BuildTemplateResponse(c, http.StatusOK, "page/edit.tmpl", gin.H{
-            "page": page,
+            "page": pageEntity,
+            "errors": errors,
         })
     }
 }

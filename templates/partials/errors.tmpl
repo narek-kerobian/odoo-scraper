@@ -1,0 +1,7 @@
+{{ define "partials/errors.tmpl" }}
+    {{ range .errors }}
+        <p style="color: #f23030; margin-bottom: 4px;">
+            <b>Error:</b> {{ . }}
+        </p>
+    {{ end }}
+{{ end }}

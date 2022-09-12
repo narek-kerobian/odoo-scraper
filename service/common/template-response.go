@@ -17,13 +17,14 @@ func BuildTemplateResponse(c *gin.Context, status int, templateName string, data
     // Load custom functions
     e.SetFuncMap(template.FuncMap{
         "ParseRawHtml": ParseRawHtml,
+        "GetAppLanguages": GetAppLanguages,
     })
 
     // Load html templates
     e.LoadHTMLFiles(
         "templates/layouts/layout.tmpl",
+        "templates/partials/errors.tmpl",
         "templates/partials/header.tmpl",
-        "templates/partials/footer.tmpl",
         pageTempalteFile,
     )
 

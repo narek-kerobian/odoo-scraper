@@ -11,6 +11,9 @@ import (
 func InitRoutes(r *gin.Engine, dbPath string) {
     db := service.InitDb(dbPath)
 
+    // Set static path
+    r.Static("/static", "./static")
+
     // Heartbeat controller
     r.GET("/heartbeat", controller.GetHeartbeat)
 

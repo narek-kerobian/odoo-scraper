@@ -1,5 +1,16 @@
 {{ define "title" }}Edit - {{ (index .page.Title 0).Text }}{{ end }}
 
+{{ define "javascripts" }}
+    <script src="/static/assets/tinymce/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+        document.pageData = {{ .page }}
+        tinymce.init({
+            selector: '#text'
+        });
+    </script>
+    <script src="/static/js/edit.js"></script>
+{{ end }}
+
 {{ define "content" }}
     <h2>{{ (index .page.Title 0).Text }}</h2>
     <h3>
@@ -12,6 +23,21 @@
         {{ end }}
     </h3>
     <form action="" method="POST">
+        {{ if (index .page.Title 0)}}
+        <label for="language">Language</label>
+        <div class="grid">
+            <div></div>
+            <div>
+                <select id="language" name="language">
+                    <option selected disabled hidden>Select language</option>
+                    {{ range GetAppLanguages }}
+                    <option value="{{ . }}">{{ . }}</option>
+                    {{ end }}
+                </select>
+            </div>
+        </div>
+        {{ end }}
+
         {{ if (index .page.Title 0)}}
         <label for="title">Page title</label>
         <div class="grid">
