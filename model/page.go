@@ -24,7 +24,7 @@ func (Page) FindAll(db *gorm.DB) (result []Page) {
     return
 }
 
-func (Page) Update(db *gorm.DB, data Page) (result Page) {
-     
+func (page Page) Update(db *gorm.DB) {
+    db.Save(&page) 
     return
 }
