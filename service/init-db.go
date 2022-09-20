@@ -1,7 +1,7 @@
 package service
 
 import (
-	"gitlab.com/bracketnco/odoo-scraper/model"
+	"github.com/narek-kerobian/odoo-scraper/model"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )

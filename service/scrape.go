@@ -7,7 +7,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly"
-	"gitlab.com/bracketnco/odoo-scraper/model"
+	"github.com/narek-kerobian/odoo-scraper/model"
 	"gorm.io/gorm"
 )
 

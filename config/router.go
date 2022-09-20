@@ -2,9 +2,9 @@ package config
 
 import (
 	"github.com/gin-gonic/gin"
-	"gitlab.com/bracketnco/odoo-scraper/controller"
-	"gitlab.com/bracketnco/odoo-scraper/middleware"
-	"gitlab.com/bracketnco/odoo-scraper/service"
+	"github.com/narek-kerobian/odoo-scraper/controller"
+	"github.com/narek-kerobian/odoo-scraper/middleware"
+	"github.com/narek-kerobian/odoo-scraper/service"
 )
 
 // Defines application routes

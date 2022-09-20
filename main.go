@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"gitlab.com/bracketnco/odoo-scraper/config"
-	"gitlab.com/bracketnco/odoo-scraper/service"
+	"github.com/narek-kerobian/odoo-scraper/config"
+	"github.com/narek-kerobian/odoo-scraper/service"
 )
 
 // Application entry point

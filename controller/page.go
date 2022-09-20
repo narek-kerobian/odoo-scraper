@@ -5,9 +5,9 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"gitlab.com/bracketnco/odoo-scraper/model"
-	service "gitlab.com/bracketnco/odoo-scraper/service/common"
-	"gitlab.com/bracketnco/odoo-scraper/service/page"
+	"github.com/narek-kerobian/odoo-scraper/model"
+	service "github.com/narek-kerobian/odoo-scraper/service/common"
+	"github.com/narek-kerobian/odoo-scraper/service/page"
 	"gorm.io/gorm"
 )
 

@@ -1,4 +1,4 @@
-module gitlab.com/bracketnco/odoo-scraper
+module github.com/narek-kerobian/odoo-scraper
 
 go 1.18
 
